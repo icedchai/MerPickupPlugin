@@ -26,7 +26,7 @@ namespace MerPickupPlugin.Managers
 
         private void OnSchematicSpawned(SchematicSpawnedEventArgs e)
         {
-            if (Plugin.Singleton.Config.Pickups.TryGetValue(e.Name, out var serializablePickup))
+            if (Plugin.Singleton.Config != null && Plugin.Singleton.Config.SchematicToPickup.TryGetValue(e.Name, out string pickupName) && Plugin.Singleton.Config.Pickups.TryGetValue(pickupName, out var serializablePickup))
             {
                 var comp = e.Schematic.gameObject.AddComponent<PickupComponent>();
 

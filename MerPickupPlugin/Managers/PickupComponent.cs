@@ -1,23 +1,8 @@
-﻿using AdminToys;
-using CustomPlayerEffects;
-using GameCore;
+﻿using CustomPlayerEffects;
 using LabApi.Features.Wrappers;
-using LiteNetLib;
-using MEC;
 using MerPickupPlugin.Serializables;
-using Mirror;
-using ProjectMER.Features.Extensions;
 using ProjectMER.Features.Objects;
-using RelativePositioning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Logger = LabApi.Features.Console.Logger;
 
 namespace MerPickupPlugin.Managers
 {
@@ -70,7 +55,10 @@ namespace MerPickupPlugin.Managers
             }
             Owner = null;
             target = null;
-            rb.useGravity = true;
+            if (rb != null)
+            {
+                rb.useGravity = true;
+            }
         }
 
         public void SetOwner(Player? player)
@@ -95,18 +83,28 @@ namespace MerPickupPlugin.Managers
                 Owner = player;
                 pickupComponents.Add(player, this);
                 Owner.EnableEffect<Slowness>(serializablePickup.MovementPenalty);
-                rb.useGravity = false;
+                if (rb != null)
+                {
+                    rb.useGravity = false;
+                }
                 // transform.parent = owner.GameObject.transform;
             }
         }
 
-        private const string vowels = "aeiou";
-
         private void OnCollisionEnter(Collision collision)
         {
-            if (Player.TryGet(collision.collider.gameObject, out Player? player) && player.IsNoclipEnabled == false)
+            if (Player.TryGet(collision.collider.gameObject, out Player? player) && player.IsNoclipEnabled == false && rb != null)
             {
-                if (rb.mass < Plugin.Singleton.Config.MinDamageWeight)
+                float minDamageWeight;
+                if (Plugin.Singleton.Config == null)
+                {
+                    minDamageWeight = new Config().MinDamageWeight;
+                }
+                else
+                {
+                    minDamageWeight = Plugin.Singleton.Config.MinDamageWeight;
+                }
+                if (rb.mass < minDamageWeight)
                 {
                     return;
                 }
@@ -120,9 +118,10 @@ namespace MerPickupPlugin.Managers
                 // Logger.Info($"relative velocity: {collision.relativeVelocity}, calced velocity: {vel}, uncapped: {Vector3.Dot(collision.contacts[0].normal, collision.relativeVelocity)}");
                 // Logger.Info($"{Vector3.Dot(collision.contacts[0].normal, collision.relativeVelocity)}, {Vector3.Dot(collision.contacts[0].normal * -1, collision.relativeVelocity)}, {Vector3.Dot(collision.contacts[0].normal, collision.relativeVelocity * -1)}");
 
+                string name = Plugin.Singleton.Config != null && Plugin.Singleton.Config.SchematicNameToPropName.TryGetValue(schematic.Name, out name) ? name : schematic.Name;
                 if (joules > 80)
                 {
-                    player.Damage(joules * 0.3f, $"Blunt force trauma: experienced {joules} joules from a{(vowels.IndexOf((schematic.Name[0])) != -1 ? "n" : "")} {(string.IsNullOrWhiteSpace(serializablePickup.Name) ? schematic.Name : serializablePickup.Name)} going at {vel} m/s. Last known holder of this object is {(PreviousOwner == null ? "unknown" : PreviousOwner.Nickname)}");
+                    player.Damage(joules * 0.3f, $"Blunt force trauma: experienced {joules} joules from a {name} going at {vel} m/s. Last known holder of this object is {(PreviousOwner == null ? "unknown" : PreviousOwner.Nickname)}");
                 }
             }
         }
@@ -130,7 +129,7 @@ namespace MerPickupPlugin.Managers
         private byte LastTeleported = 0;
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent(out TeleportObject teleporter) && LastTeleported == 0)
+            if (other.TryGetComponent(out TeleportObject teleporter) && LastTeleported == 0 && rb != null)
             {
                 TeleportObject? target = teleporter.GetRandomTarget();
 
@@ -163,6 +162,11 @@ namespace MerPickupPlugin.Managers
             {
                 RemoveOwner();
                 return;
+            }
+
+            if (rb == null)
+            {
+                rb = schematic.gameObject.AddComponent<Rigidbody>();
             }
 
             if (target == null)

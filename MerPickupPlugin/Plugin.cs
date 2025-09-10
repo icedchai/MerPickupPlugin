@@ -45,6 +45,8 @@ namespace MerPickupPlugin
             ServerSpecificSettingsSync.SendToAll();
             PickupManager = new PickupManager();
             PickupManager.Subscribe();
+
+            Timing.CallDelayed(5f, () => MEROptimizer.Plugin.merOptimizer.excludedNames.AddRange(Config.SchematicToPickup.Keys));
         }
 
         private Dictionary<Player, float> throwStrengths = new Dictionary<Player, float>();

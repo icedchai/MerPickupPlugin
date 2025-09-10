@@ -10,8 +10,6 @@ namespace MerPickupPlugin.Serializables
     [Serializable]
     public class SerializablePickup
     {
-        public string Name { get; set; } = string.Empty;
-
         public float Mass { get; set; } = 1f;
 
         public float MinThrowStrength { get; set; } = 1f;

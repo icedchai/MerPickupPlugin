@@ -26,7 +26,6 @@ namespace MerPickupPlugin.Managers
             }
             transform.position = camera.position;
             transform.rotation = camera.rotation;
-            return;
             Vector3 camRot = camera.eulerAngles;
             float vertRot = camRot.x;
             if (vertRot > 90)
