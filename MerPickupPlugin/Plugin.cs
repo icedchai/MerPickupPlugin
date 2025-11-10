@@ -16,7 +16,7 @@ namespace MerPickupPlugin
 
         public override string Author => "icedchqi";
 
-        public override Version Version => new Version(0, 0, 1);
+        public override Version Version => new Version(1, 0);
 
         public override Version RequiredApiVersion => new(LabApiProperties.CompiledVersion);
 
@@ -46,7 +46,7 @@ namespace MerPickupPlugin
             PickupManager = new PickupManager();
             PickupManager.Subscribe();
 
-            Timing.CallDelayed(5f, () => MEROptimizer.Plugin.merOptimizer.excludedNames.AddRange(Config.SchematicToPickup.Keys));
+            // Timing.CallDelayed(5f, () => MEROptimizer.Plugin.merOptimizer.excludedNames.AddRange(Config.SchematicToPickup.Keys));
         }
 
         private Dictionary<Player, float> throwStrengths = new Dictionary<Player, float>();
