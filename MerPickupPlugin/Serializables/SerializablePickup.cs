@@ -12,6 +12,8 @@ namespace MerPickupPlugin.Serializables
     {
         public float Mass { get; set; } = 1f;
 
+        public bool PlayerCollidable { get; set; } = true;
+
         public float MinThrowStrength { get; set; } = 1f;
 
         public float MaxThrowStrength { get; set; } = 3f;

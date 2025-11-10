@@ -37,10 +37,49 @@ namespace MerPickupPlugin.Managers
                 comp.schematic = e.Schematic;
                 comp.Init(rb, serializablePickup);
 
+                if (!serializablePickup.PlayerCollidable)
+                {
+                    comp.gameObject.layer = 9;
+                }
+
                 foreach (var p in e.Schematic.AdminToyBases)
                 {
                     if (p is PrimitiveObjectToy primToy)
                     {
+                        if (!serializablePickup.PlayerCollidable)
+                        {
+                            if (primToy.NetworkPrimitiveFlags.HasFlag(PrimitiveFlags.Collidable))
+                            {
+                                Collider collider;
+                                switch (primToy.PrimitiveType)
+                                {
+                                    case PrimitiveType.Cube:
+                                        collider = primToy.gameObject.AddComponent<BoxCollider>();
+                                        break;
+                                    case PrimitiveType.Quad:
+                                        collider = primToy.gameObject.AddComponent<BoxCollider>();
+                                        collider.transform.localScale = new Vector3(1, 1, 0.01f);
+                                        break;
+                                    case PrimitiveType.Sphere:
+                                        collider = primToy.gameObject.AddComponent<SphereCollider>();
+                                        break;
+                                    case PrimitiveType.Capsule:
+                                        collider = primToy.gameObject.AddComponent<CapsuleCollider>();
+                                        break;
+                                    case PrimitiveType.Cylinder:
+                                        GameObject cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                                        cylinder.transform.parent = primToy.transform;
+                                        cylinder.transform.localScale = Vector3.one;
+                                        break;
+                                    case PrimitiveType.Plane:
+                                        collider = primToy.gameObject.AddComponent<BoxCollider>();
+                                        collider.transform.localEulerAngles = new Vector3(10, 10, 0.01f);
+                                        break;
+                                }
+                            }
+                            primToy.NetworkPrimitiveFlags &= ~PrimitiveFlags.Collidable;
+                        }
+
                         InteractableToy interactableToy = SpawnInteractableToy(primToy);
                         if (interactableToy == null)
                         {
