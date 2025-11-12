@@ -16,7 +16,7 @@ namespace MerPickupPlugin
 
         public override string Author => "icedchqi";
 
-        public override Version Version => new Version(1, 0);
+        public override Version Version => new Version(1, 0, 1);
 
         public override Version RequiredApiVersion => new(LabApiProperties.CompiledVersion);
 
