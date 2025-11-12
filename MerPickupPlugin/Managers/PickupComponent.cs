@@ -119,9 +119,15 @@ namespace MerPickupPlugin.Managers
                 // Logger.Info($"{Vector3.Dot(collision.contacts[0].normal, collision.relativeVelocity)}, {Vector3.Dot(collision.contacts[0].normal * -1, collision.relativeVelocity)}, {Vector3.Dot(collision.contacts[0].normal, collision.relativeVelocity * -1)}");
 
                 string name = Plugin.Singleton.Config != null && Plugin.Singleton.Config.SchematicNameToPropName.TryGetValue(schematic.Name, out name) ? name : schematic.Name;
+
                 if (joules > 80)
                 {
                     player.Damage(joules * 0.3f, $"Blunt force trauma: experienced {joules} joules from a {name} going at {vel} m/s. Last known holder of this object is {(PreviousOwner == null ? "unknown" : PreviousOwner.Nickname)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(serializablePickup.CollisionMessage))
+                {
+                    player.SendHint(serializablePickup.CollisionMessage);
                 }
             }
         }

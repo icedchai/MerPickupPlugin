@@ -35,5 +35,7 @@ namespace MerPickupPlugin.Serializables
         public Vector3 CenterOfMass { get; set; } = Vector3.zero;
 
         public float MaxDistance { get; set; } = 9f;
+
+        public string CollisionMessage { get; set; } = "You feel an object hitting you";
     }
 }
